@@ -167,7 +167,7 @@ cython_debug/
 
 
 # Session
-session/
+sessions/
 
 # Instance
 instance/
