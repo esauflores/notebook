@@ -6,3 +6,6 @@ flask
 flask_session 
 flask-socketio
 flask_sqlalchemy
+
+daphne 
+eventlet
