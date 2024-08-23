@@ -4,7 +4,7 @@
           data-drawer-toggle="notebooks-sidebar"
           aria-controls="notebooks-sidebar"
           type="button"
-          class="inline-flex items-center p-2 mt-2 ms-3 text-sm text-gray-500 rounded-lg md:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600">
+          class="inline-flex items-center p-2 mt-2 ms-3 text-sm text-gray-500 rounded-lg md:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 text-gray-400 hover:bg-gray-700 focus:ring-gray-600">
     <span class="sr-only">Open sidebar</span>
     <svg class="w-6 h-6"
          fill="currentColor"
@@ -18,18 +18,18 @@
          class="fixed top-0 left-0 z-40 h-screen transition-transform -translate-x-full md:translate-x-0"
          aria-label="NotebooksSidebar">
     <div class="flex flex-row h-screen">
-      <div class="h-full w-64 pl-5 pr-3 py-2 overflow-y-auto bg-gray-50 dark:bg-gray-800">
+      <div class="h-full w-64 pl-5 pr-3 py-2 overflow-y-auto bg-gray-50 bg-gray-800">
         <ul class="space-y-2 font-medium">
           <li>
-            <div class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
+            <div class="flex items-center p-2 text-gray-900 rounded-lg text-white hover:bg-gray-100 hover:bg-gray-700 group">
               {% include "components/icons/notes.html" %}
               <span class="flex-1 ms-3 whitespace-nowrap">All Notes</span>
-              <span class="inline-flex items-center justify-center w-5 h-5 ms-2 text-sm rounded-full font-medium text-gray-800 bg-gray-100 dark:bg-gray-700 dark:text-gray-300 group-hover:text-gray-900 dark:group-hover:text-white transition duration-75"
+              <span class="inline-flex items-center justify-center w-5 h-5 ms-2 text-sm rounded-full font-medium  bg-gray-100 bg-gray-700 text-gray-300 group-hover:text-gray-900 group-hover:text-white transition duration-75"
                     id="notes-count">{{ notebooks | map(attribute='notes_count') | sum }}</span>
             </div>
           </li>
           <li>
-            <div class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
+            <div class="flex items-center p-2 text-gray-900 rounded-lg text-white hover:bg-gray-100 hover:bg-gray-700 group">
               {% include "components/icons/add_note.html" %}
               <span class="flex-1 ms-3 whitespace-nowrap">Notebooks</span>
               <span class="inline-flex items-center justify-center pr-1.5 inside-svg cursor-pointer"
@@ -37,10 +37,10 @@
             </div>
           </li>
           <li class="hidden" id="notebook-form">
-            <div class="flex items-center py-2 text-gray-900 rounded-lg dark:text-white group">
+            <div class="flex items-center py-2 text-gray-900 rounded-lg text-white group">
               <input type="text"
                      id="notebook-name"
-                     class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg  block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
+                     class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg  block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white"
                      placeholder="Notebook name"
                      required />
             </div>
@@ -48,11 +48,11 @@
           <ul id="notebook-list">
             {% for notebook in notebooks %}
               <li>
-                <div class="flex items-center my-1 p-2 pl-3 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group has-[:checked]:bg-gray-100 dark:has-[:checked]:bg-gray-700"
+                <div class="flex items-center my-1 p-2 pl-3 text-gray-900 rounded-lg text-white hover:bg-gray-100 hover:bg-gray-700 group has-[:checked]:bg-gray-100 has-[:checked]:bg-gray-700"
                      id="notebook-{{ notebook.id }}"
                      onclick="showNotes({{ notebook.id }})">
                   <span class="flex-1 ms-3 whitespace-nowrap overflow-hidden text-ellipsis">{{ notebook.name }}</span>
-                  <span class="notes_count inline-flex items-center justify-center w-5 h-5 ms-2 text-sm rounded-full font-medium text-gray-800 bg-gray-100 dark:bg-gray-700 dark:text-gray-300 group-hover:text-gray-900 dark:group-hover:text-white transition duration-75">
+                  <span class="notes_count inline-flex items-center justify-center w-5 h-5 ms-2 text-sm rounded-full font-medium  bg-gray-100 bg-gray-700 text-gray-300 group-hover:text-gray-900 group-hover:text-white transition duration-75">
                     {{ notebook.notes_count }}
                   </span>
                   <input type="radio"
@@ -65,36 +65,36 @@
           </ul>
         </ul>
       </div>
-      <div class="h-full w-0 py-4 overflow-y-auto bg-gray-50 dark:bg-gray-700"
+      <div class="h-full w-0 py-4 overflow-y-auto bg-gray-50 bg-gray-700"
            id="active-notes">
         <div id="notes-sidebar">
           <div class="flex flex-col items-center justify-center">
             <div class="mx-2">
               <input type="text"
                      id="selected-notebook-name"
-                     class="bg-gray-50 border border-gray-300 text-gray-900 text-lg rounded-lg  block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
+                     class="bg-gray-50 border border-gray-300 text-gray-900 text-lg rounded-lg  block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white"
                      placeholder="Notebook name"
                      required />
             </div>
             <div class="flex my-2 mt-4 items-center justify-center gap-4">
-              <span class="p-2 group text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-600 rounded-lg cursor-pointer"
+              <span class="p-2 group text-gray-900 text-white hover:bg-gray-100 hover:bg-gray-600 rounded-lg cursor-pointer"
                     id="add-note">{% include "components/icons/add_note.html" %}</span>
-              <span class="p-2 group text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-600 rounded-lg cursor-pointer"
+              <span class="p-2 group text-gray-900 text-white hover:bg-gray-100 hover:bg-gray-600 rounded-lg cursor-pointer"
                     id="edit-notebook">{% include "components/icons/edit.html" %}</span>
-              <span class="p-2 group text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-600 rounded-lg cursor-pointer"
+              <span class="p-2 group text-gray-900 text-white hover:bg-gray-100 hover:bg-gray-600 rounded-lg cursor-pointer"
                     id="delete-notebook">{% include "components/icons/delete.html" %}</span>
             </div>
           </div>
-          <hr class="h-0.5 bg-gray-200 dark:bg-gray-600 border-0" />
+          <hr class="h-0.5 bg-gray-200 bg-gray-600 border-0" />
           <div class="hidden" id="note-form">
-            <div class="flex items-center mx-1 py-2 text-gray-900 rounded-lg dark:text-white group">
+            <div class="flex items-center mx-1 py-2 text-gray-900 rounded-lg text-white group">
               <input type="text"
                      id="note-name"
-                     class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg  block w-full p-2.5 dark:bg-gray-600 dark:border-gray-700 dark:placeholder-gray-400 dark:text-white"
+                     class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg  block w-full p-2.5 bg-gray-600 border-gray-700 placeholder-gray-400 text-white"
                      placeholder="Note title"
                      required />
             </div>
-            <hr class="h-0.5 bg-gray-200 dark:bg-gray-600 border-0" />
+            <hr class="h-0.5 bg-gray-200 bg-gray-600 border-0" />
           </div>
           <ul id="note-list" class="hidden">
           </ul>
@@ -116,17 +116,17 @@
     <div class="flex flex-col items-center justify-between">
       <input type="text"
              id="selected-note-name"
-             class="bg-gray-50 border border-gray-300 text-gray-900 text-xl rounded-lg  block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
+             class="bg-gray-50 border border-gray-300 text-gray-900 text-xl rounded-lg  block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white"
              placeholder="Notebook name"
              required />
       <textarea id="selected-note-content"
-                class="mt-8 bg-gray-50 border border-gray-300 text-gray-900 text-lg rounded-lg  block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white h-[500px] resize-none"
+                class="mt-8 bg-gray-50 border border-gray-300 text-gray-900 text-lg rounded-lg  block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white h-[500px] resize-none"
                 placeholder="Note content"
                 required></textarea>
       <div class="flex mt-8 items-center justify-center gap-4">
-        <span class="p-2 big-svg group text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-600 rounded-lg cursor-pointer"
+        <span class="p-2 big-svg group text-gray-900 text-white hover:bg-gray-100 hover:bg-gray-600 rounded-lg cursor-pointer"
               id="edit-note">{% include "components/icons/edit.html" %}</span>
-        <span class="p-2 big-svg group text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-600 rounded-lg cursor-pointer"
+        <span class="p-2 big-svg group text-gray-900 text-white hover:bg-gray-100 hover:bg-gray-600 rounded-lg cursor-pointer"
               id="delete-note">{% include "components/icons/delete.html" %}</span>
       </div>
     </div>
@@ -167,15 +167,14 @@
       width: 32rem;
     }
 
-    @media (prefers-color-scheme: dark){
-      svg {
-        color: #9ca3af;
-      }
-
-      .group:hover svg {
-        color: #ffffff;
-      }
+    svg {
+      color: #9ca3af;
     }
+
+    .group:hover svg {
+      color: #ffffff;
+    }
+    
 
     #note-content {
       transition: opacity 0.4s ease-in-out, transform 0.4s ease-in-out;
@@ -452,9 +451,9 @@
       notebooks.forEach(notebook => {
         const li = document.createElement('li');
         li.innerHTML = `
-          <div class="flex items-center my-1 p-2 pl-3 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group has-[:checked]:bg-gray-100 dark:has-[:checked]:bg-gray-700" id="notebook-${notebook.id}" onclick="showNotes(${notebook.id})">
+          <div class="flex items-center my-1 p-2 pl-3 text-gray-900 rounded-lg text-white hover:bg-gray-100 hover:bg-gray-700 group has-[:checked]:bg-gray-100 has-[:checked]:bg-gray-700" id="notebook-${notebook.id}" onclick="showNotes(${notebook.id})">
             <span class="flex-1 ms-3 whitespace-nowrap overflow-hidden text-ellipsis">${notebook.name}</span>
-            <span class="notes_count inline-flex items-center justify-center w-5 h-5 ms-2 text-sm rounded-full font-medium text-gray-800 bg-gray-100 dark:bg-gray-700 dark:text-gray-300 group-hover:text-gray-900 dark:group-hover:text-white transition duration-75">
+            <span class="notes_count inline-flex items-center justify-center w-5 h-5 ms-2 text-sm rounded-full font-medium  bg-gray-100 bg-gray-700 text-gray-300 group-hover:text-gray-900 group-hover:text-white transition duration-75">
               ${notebook.notes_count}
             </span>
             <input type="radio" class="invisible" name="selected-notebook" value="${notebook.id}" ${selected_notebook && selected_notebook.id === notebook.id ? 'checked' : ''} />
@@ -476,13 +475,13 @@
         const li = document.createElement('li');
         li.id = `note-${note.id}`;
         li.innerHTML = `
-          <div class="flex items-center my-2 mx-1 p-2 pl-3 rounded-lg text-gray-900 dark:text-white hover:bg-gray-200 dark:hover:bg-gray-800 group has-[:checked]:bg-gray-200 dark:has-[:checked]:bg-gray-800" onclick="showNoteContent(${note.id})">
+          <div class="flex items-center my-2 mx-1 p-2 pl-3 rounded-lg text-gray-900 text-white hover:bg-gray-200 hover:bg-gray-800 group has-[:checked]:bg-gray-200 has-[:checked]:bg-gray-800" onclick="showNoteContent(${note.id})">
             <span class="flex-1 whitespace-nowrap overflow-hidden text-ellipsis">${note.title}</span>
             <input type="radio" class="invisible" name="selected-note" value="${note.id}" ${selected_note && selected_note.id === note.id ? 'checked' : ''} />
           </div>
         `;
         const hr = document.createElement('hr');
-        hr.classList.add('h-0.5', 'bg-gray-200', 'dark:bg-gray-600', 'border-0');
+        hr.classList.add('h-0.5', 'bg-gray-200', 'bg-gray-600', 'border-0');
         li.appendChild(hr);
         noteList.appendChild(li);
       });
