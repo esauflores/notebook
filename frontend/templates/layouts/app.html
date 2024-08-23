@@ -9,6 +9,9 @@
       {% block title %}
       {% endblock title %}
     </title>
+    {# favicon #}
+    <link rel="icon"
+          href="{{ url_for('static', filename='images/favicon/favicon.ico') }}">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/flowbite@2.4.1/dist/flowbite.min.js"></script>
     {% block styles %}
