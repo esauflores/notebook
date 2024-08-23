@@ -12,8 +12,11 @@
     {# favicon #}
     <link rel="icon"
           href="{{ url_for('static', filename='images/favicon/favicon.ico') }}">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/flowbite@2.4.1/dist/flowbite.min.js"></script>
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/notyf.min.css') }}">
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/icon.css') }}">
+    <script src="{{ url_for('static', filename='js/tailwind.js') }}"></script>
     {% block styles %}
     {% endblock styles %}
   </head>
@@ -25,6 +28,8 @@
       {% block content %}
       {% endblock content %}
     </main>
+    <script src="{{ url_for('static', filename='js/flowbite.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/notyf.min.js') }}"></script>
     {% block scripts %}
     {% endblock scripts %}
   </body>

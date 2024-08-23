@@ -178,7 +178,7 @@
     }
 
     #note-content {
-      transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
+      transition: opacity 0.4s ease-in-out, transform 0.4s ease-in-out;
       opacity: 0;
       transform: translateY(0px);
     }
@@ -189,7 +189,7 @@
     }
 
     #active-notes {
-      transition: width 0.5s ease-in-out;
+      transition: width 0.4s ease-in-out;
       width: 0;
       overflow: hidden;
     }
@@ -200,11 +200,15 @@
 
     #notes-sidebar {
       opacity: 0;
-      transition: opacity 0.5s ease-in-out;
+      transition: opacity 0.4s ease-in-out;
     }
 
     #notes-sidebar.visible {
       opacity: 1;
+    }
+
+    .notyf__icon {
+      display: flex !important;
     }
 
 
@@ -218,6 +222,36 @@
 {% block scripts %}
   <script>
     const notebooks = {{ notebooks|tojson }}
+    var notyf = new Notyf({
+      duration: 2000,
+      ripple: true,
+      position: {
+        x: 'right',
+        y: 'top',
+      },
+
+      types : [
+        {
+          type: 'success',
+          background: '#06402b',
+          icon: {
+            className: 'material-icons !text-white',
+            tagName: 'i',
+            text: 'check_circle',
+          },
+        },
+        {
+          type: 'error',
+          background: '#4C0805',
+          icon: {
+            className: 'material-icons',
+            tagName: 'i',
+            text: 'error',
+          },
+        },
+      ],
+
+    });
 
     var selected_notebook = null;
     var selected_note = null;
@@ -260,6 +294,10 @@
             notebookForm.classList.add('hidden');
             notebooks.push(data);
             updateNotebookList();
+            notyf.success('Created successfully');
+          })
+          .catch(error => {
+            notyf.error('An error occurred');
           });
       }
     });
@@ -274,7 +312,7 @@
       const loadingNotes = document.getElementById('loading-notes');
       const noteList = document.getElementById('note-list');
       const notebookElementInput = notebookElement.querySelector('input');
-
+      const noteContent = document.getElementById('note-content');
 
       if (notebookElementInput.checked) {
         notebookElementInput.checked = false;
@@ -283,6 +321,10 @@
 
         activeNotes.classList.remove('active-notes');
         notebooksSidebar.classList.remove('active-notes');
+
+        selected_note = null;
+        noteContent.classList.remove('active-notes');
+
       } else {
         const selectedNotebookName = document.getElementById('selected-notebook-name');
         notebookElementInput.checked = true;
@@ -291,6 +333,8 @@
         activeNotes.classList.remove('active-notes');
         notebooksSidebar.classList.remove('active-notes');
   
+        selected_note = null;
+        noteContent.classList.remove('active-notes');
 
         setTimeout(() => {
           selectedNotebookName.value = notebook.name;
@@ -309,7 +353,7 @@
             loadingNotes.classList.add('hidden');
             updateNoteList(data.notes); // This remove hidden class from noteList
           });
-        }, selected_notebook ? 500 : 0);
+        }, selected_notebook ? 400 : 0);
 
         selected_notebook = notebook;
       }
@@ -349,6 +393,11 @@
 
           const notesCount = document.getElementById('notes-count');
           notesCount.textContent = notebooks.map(n => n.notes_count).reduce((a, b) => a + b, 0);
+
+          notyf.success('Deleted successfully');
+        })
+        .catch(error => {
+          notyf.error('An error occurred');
         });
     });
 
@@ -385,6 +434,11 @@
             notebookElement.querySelector('.notes_count').textContent = selected_notebook.notes_count;
 
             updateNoteList(selected_notebook.notes);
+
+            notyf.success('Created successfully');
+          })
+          .catch(error => {
+            notyf.error('An error occurred');
           });
       }
     });
@@ -462,7 +516,7 @@
           selectedNoteName.value = note.title;
           selectedNoteContent.value = note.content;
 
-        }, selected_note ? 500 : 0);
+        }, selected_note ? 400 : 0);
 
         selected_note = note;
       }
@@ -494,6 +548,14 @@
         .then(data => {
           selected_notebook.notes[selected_notebook.notes.findIndex(n => n.id === selected_note.id)] = data;
           selected_note = data;
+
+          const noteElement = document.getElementById(`note-${selected_note.id}`);
+          noteElement.querySelector('span').textContent = data.title;
+
+          notyf.success('Updated successfully');
+        })
+        .catch(error => {
+          notyf.error('An error');
         });
     });
 
@@ -529,6 +591,11 @@
           const noteContent = document.getElementById('note-content');
           noteContent.classList.remove('active-notes');
           selected_note = null;
+
+          notyf.success('Deleted successfully');
+        })
+        .catch(error => {
+          notyf.error('An error occurred');
         });
     });
 
@@ -557,6 +624,11 @@
           const notebookElement = document.getElementById(`notebook-${selected_notebook.id}`);
           notebookElement.querySelector('span').textContent = data.name;
           selected_notebook = data;
+
+          notyf.success('Updated successfully');
+        })
+        .catch(error => {
+          notyf.error('An error occurred');
         });
     });
 
