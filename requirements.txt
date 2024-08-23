@@ -9,3 +9,4 @@ flask_sqlalchemy
 
 daphne 
 eventlet
+python-socketio
