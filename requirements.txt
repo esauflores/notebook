@@ -1,0 +1,8 @@
+python-dotenv
+djLint
+shed
+
+flask
+flask_session 
+flask-socketio
+flask_sqlalchemy

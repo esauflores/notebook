@@ -1,0 +1,564 @@
+{% extends "layouts/app.html" %}
+{% block content %}
+  <button data-drawer-target="notebooks-sidebar"
+          data-drawer-toggle="notebooks-sidebar"
+          aria-controls="notebooks-sidebar"
+          type="button"
+          class="inline-flex items-center p-2 mt-2 ms-3 text-sm text-gray-500 rounded-lg md:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600">
+    <span class="sr-only">Open sidebar</span>
+    <svg class="w-6 h-6"
+         fill="currentColor"
+         viewBox="0 0 20 20"
+         xmlns="http://www.w3.org/2000/svg">
+      <path clip-rule="evenodd" fill-rule="evenodd" d="M2 4.75A.75.75 0 012.75 4h14.5a.75.75 0 010 1.5H2.75A.75.75 0 012 4.75zm0 10.5a.75.75 0 01.75-.75h7.5a.75.75 0 010 1.5h-7.5a.75.75 0 01-.75-.75zM2 10a.75.75 0 01.75-.75h14.5a.75.75 0 010 1.5H2.75A.75.75 0 012 10z">
+      </path>
+    </svg>
+  </button>
+  <aside id="notebooks-sidebar"
+         class="fixed top-0 left-0 z-40 h-screen transition-transform -translate-x-full md:translate-x-0"
+         aria-label="NotebooksSidebar">
+    <div class="flex flex-row h-screen">
+      <div class="h-full w-64 pl-5 pr-3 py-2 overflow-y-auto bg-gray-50 dark:bg-gray-800">
+        <ul class="space-y-2 font-medium">
+          <li>
+            <div class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
+              {% include "components/icons/notes.html" %}
+              <span class="flex-1 ms-3 whitespace-nowrap">All Notes</span>
+              <span class="inline-flex items-center justify-center w-5 h-5 ms-2 text-sm rounded-full font-medium text-gray-800 bg-gray-100 dark:bg-gray-700 dark:text-gray-300 group-hover:text-gray-900 dark:group-hover:text-white transition duration-75"
+                    id="notes-count">{{ notebooks | map(attribute='notes_count') | sum }}</span>
+            </div>
+          </li>
+          <li>
+            <div class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
+              {% include "components/icons/add_note.html" %}
+              <span class="flex-1 ms-3 whitespace-nowrap">Notebooks</span>
+              <span class="inline-flex items-center justify-center pr-1.5 inside-svg cursor-pointer"
+                    id="add-notebook">{% include "components/icons/plus.html" %}</span>
+            </div>
+          </li>
+          <li class="hidden" id="notebook-form">
+            <div class="flex items-center py-2 text-gray-900 rounded-lg dark:text-white group">
+              <input type="text"
+                     id="notebook-name"
+                     class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg  block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
+                     placeholder="Notebook name"
+                     required />
+            </div>
+          </li>
+          <ul id="notebook-list">
+            {% for notebook in notebooks %}
+              <li>
+                <div class="flex items-center my-1 p-2 pl-3 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group has-[:checked]:bg-gray-100 dark:has-[:checked]:bg-gray-700"
+                     id="notebook-{{ notebook.id }}"
+                     onclick="showNotes({{ notebook.id }})">
+                  <span class="flex-1 ms-3 whitespace-nowrap overflow-hidden text-ellipsis">{{ notebook.name }}</span>
+                  <span class="notes_count inline-flex items-center justify-center w-5 h-5 ms-2 text-sm rounded-full font-medium text-gray-800 bg-gray-100 dark:bg-gray-700 dark:text-gray-300 group-hover:text-gray-900 dark:group-hover:text-white transition duration-75">
+                    {{ notebook.notes_count }}
+                  </span>
+                  <input type="radio"
+                         class="invisible"
+                         name="selected-notebook"
+                         value="{{ notebook.id }}">
+                </div>
+              </li>
+            {% endfor %}
+          </ul>
+        </ul>
+      </div>
+      <div class="h-full w-0 py-4 overflow-y-auto bg-gray-50 dark:bg-gray-700"
+           id="active-notes">
+        <div id="notes-sidebar">
+          <div class="flex flex-col items-center justify-center">
+            <div class="mx-2">
+              <input type="text"
+                     id="selected-notebook-name"
+                     class="bg-gray-50 border border-gray-300 text-gray-900 text-lg rounded-lg  block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
+                     placeholder="Notebook name"
+                     required />
+            </div>
+            <div class="flex my-2 mt-4 items-center justify-center gap-4">
+              <span class="p-2 group text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-600 rounded-lg cursor-pointer"
+                    id="add-note">{% include "components/icons/add_note.html" %}</span>
+              <span class="p-2 group text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-600 rounded-lg cursor-pointer"
+                    id="edit-notebook">{% include "components/icons/edit.html" %}</span>
+              <span class="p-2 group text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-600 rounded-lg cursor-pointer"
+                    id="delete-notebook">{% include "components/icons/delete.html" %}</span>
+            </div>
+          </div>
+          <hr class="h-0.5 bg-gray-200 dark:bg-gray-600 border-0" />
+          <div class="hidden" id="note-form">
+            <div class="flex items-center mx-1 py-2 text-gray-900 rounded-lg dark:text-white group">
+              <input type="text"
+                     id="note-name"
+                     class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg  block w-full p-2.5 dark:bg-gray-600 dark:border-gray-700 dark:placeholder-gray-400 dark:text-white"
+                     placeholder="Note title"
+                     required />
+            </div>
+            <hr class="h-0.5 bg-gray-200 dark:bg-gray-600 border-0" />
+          </div>
+          <ul id="note-list" class="hidden">
+          </ul>
+          <div class="flex items-center justify-center h-12 hidden"
+               id="loading-notes">
+            <svg class="spinner shrink h-8 mx-2 animate-spin"
+                 xmlns="http://www.w3.org/2000/svg"
+                 stroke="rgb(156 163 175 / var(--tw-text-opacity))"
+                 fill="rgb(156 163 175 / var(--tw-text-opacity))"
+                 viewBox="0 0 512 512">
+              <path d="M304 48a48 48 0 1 0 -96 0 48 48 0 1 0 96 0zm0 416a48 48 0 1 0 -96 0 48 48 0 1 0 96 0zM48 304a48 48 0 1 0 0-96 48 48 0 1 0 0 96zm464-48a48 48 0 1 0 -96 0 48 48 0 1 0 96 0zM142.9 437A48 48 0 1 0 75 369.1 48 48 0 1 0 142.9 437zm0-294.2A48 48 0 1 0 75 75a48 48 0 1 0 67.9 67.9zM369.1 437A48 48 0 1 0 437 369.1 48 48 0 1 0 369.1 437z" />
+            </svg>
+          </div>
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="px-16 py-8" id="note-content">
+    <div class="flex flex-col items-center justify-between">
+      <input type="text"
+             id="selected-note-name"
+             class="bg-gray-50 border border-gray-300 text-gray-900 text-xl rounded-lg  block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
+             placeholder="Notebook name"
+             required />
+      <textarea id="selected-note-content"
+                class="mt-8 bg-gray-50 border border-gray-300 text-gray-900 text-lg rounded-lg  block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white h-[600px] resize-none"
+                placeholder="Note content"
+                required></textarea>
+      <div class="flex mt-8 items-center justify-center gap-4">
+        <span class="p-2 big-svg group text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-600 rounded-lg cursor-pointer"
+              id="edit-note">{% include "components/icons/edit.html" %}</span>
+        <span class="p-2 big-svg group text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-600 rounded-lg cursor-pointer"
+              id="delete-note">{% include "components/icons/delete.html" %}</span>
+      </div>
+    </div>
+  </div>
+{% endblock content %}
+{% block styles %}
+  <style>
+    svg {
+      width: 1.25rem;
+      height: 1.25rem;
+      color: #6b7280;
+      transition: color 0.75s;
+    }
+
+    .group:hover svg {
+      color: #111827;
+    }
+
+    .inside-svg svg{
+      width: 0.75rem;
+      height: 0.75rem;
+    }
+
+    .big-svg svg {
+      width: 1.5rem;
+      height: 1.5rem;
+    }
+
+    .selected-notebook {
+      background-color: #f3f4f6;
+    }
+
+    .notebooks-sidebar {
+      width: 16rem;
+    }
+
+    .notebooks-sidebar .active-notes{
+      width: 32rem;
+    }
+
+    @media (prefers-color-scheme: dark){
+      svg {
+        color: #9ca3af;
+      }
+
+      .group:hover svg {
+        color: #ffffff;
+      }
+    }
+
+    #note-content {
+      transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
+      opacity: 0;
+      transform: translateY(0px);
+    }
+
+    #note-content.active-notes {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    #active-notes {
+      transition: width 0.5s ease-in-out;
+      width: 0;
+      overflow: hidden;
+    }
+
+    #active-notes.active-notes {
+      width: 16rem; /* Adjust this value as needed */
+    }
+
+    #notes-sidebar {
+      opacity: 0;
+      transition: opacity 0.5s ease-in-out;
+    }
+
+    #notes-sidebar.visible {
+      opacity: 1;
+    }
+
+
+    @media (min-width: 768px){
+       #note-content {
+        margin-left: 32rem;
+       }
+    }
+  </style>
+{% endblock styles %}
+{% block scripts %}
+  <script>
+    const notebooks = {{ notebooks|tojson }}
+
+    var selected_notebook = null;
+    var selected_note = null;
+
+    // Show/hide the notebook form
+    const addNotebook = document.getElementById('add-notebook');
+    addNotebook.addEventListener('click', () => {
+      const notebookForm = document.getElementById('notebook-form');
+      notebookForm.classList.toggle('hidden');
+    });
+
+    // Show/hide the note form
+    const addNote = document.getElementById('add-note');
+    addNote.addEventListener('click', () => {
+      const noteForm = document.getElementById('note-form');
+      noteForm.classList.toggle('hidden');
+    });
+
+    // Add a new notebook
+    const notebookName = document.getElementById('notebook-name');
+    notebookName.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        const notebookForm = document.getElementById('notebook-form');
+        
+        if (notebookName.value === '') {
+          notebookForm.classList.add('hidden');
+          return;
+        }
+
+        fetch('/api/notebook/create', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ name: notebookName.value }),
+        })
+          .then(response => response.json())
+          .then(data => {
+            notebookName.value = '';
+            notebookForm.classList.add('hidden');
+            notebooks.push(data);
+            updateNotebookList();
+          });
+      }
+    });
+
+    // Show notes for a notebook
+    function showNotes(notebookId) {
+      const notebook = notebooks.find(n => n.id === notebookId);
+      const notebookElement = document.getElementById(`notebook-${notebookId}`);
+      const activeNotes = document.getElementById('active-notes');
+      const notebooksSidebar = document.getElementById('notebooks-sidebar');
+      const notesSidebar = document.getElementById('notes-sidebar');
+      const loadingNotes = document.getElementById('loading-notes');
+      const noteList = document.getElementById('note-list');
+      const notebookElementInput = notebookElement.querySelector('input');
+
+
+      if (notebookElementInput.checked) {
+        notebookElementInput.checked = false;
+        notesSidebar.classList.remove('visible');
+        selected_notebook = null;
+
+        activeNotes.classList.remove('active-notes');
+        notebooksSidebar.classList.remove('active-notes');
+      } else {
+        const selectedNotebookName = document.getElementById('selected-notebook-name');
+        notebookElementInput.checked = true;
+
+        notesSidebar.classList.remove('visible');
+        activeNotes.classList.remove('active-notes');
+        notebooksSidebar.classList.remove('active-notes');
+  
+
+        setTimeout(() => {
+          selectedNotebookName.value = notebook.name;
+          notesSidebar.classList.add('visible');
+          activeNotes.classList.add('active-notes');
+          notebooksSidebar.classList.add('active-notes');
+
+          noteList.classList.add('hidden');
+          loadingNotes.classList.remove('hidden');
+
+
+          fetch(`/api/notebook/${notebookId}`)
+          .then(response => response.json())
+          .then(data => {
+            notebooks[notebooks.findIndex(n => n.id === notebookId)] = data;
+            loadingNotes.classList.add('hidden');
+            updateNoteList(data.notes); // This remove hidden class from noteList
+          });
+        }, selected_notebook ? 500 : 0);
+
+        selected_notebook = notebook;
+      }
+    }
+
+    // Delete a notebook
+    const deleteNotebook = document.getElementById('delete-notebook');
+    deleteNotebook.addEventListener('click', () => {
+      if (!selected_notebook) {
+        return;
+      }
+
+      fetch(`/api/notebook/delete/${selected_notebook.id}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+        .then(response => response.json())
+        .then(data => {
+          const notebookElement = document.getElementById(`notebook-${selected_notebook.id}`);
+          notebookElement.remove();
+
+          notebooks.splice(notebooks.findIndex(n => n.id === selected_notebook.id), 1);
+
+          const notesSidebar = document.getElementById('notes-sidebar');
+          const activeNotes = document.getElementById('active-notes');
+          const noteContent = document.getElementById('note-content');
+          const notebooksSidebar = document.getElementById('notebooks-sidebar');
+
+          notesSidebar.classList.remove('visible');
+          selected_notebook = null;
+
+          activeNotes.classList.remove('active-notes');
+          noteContent.classList.remove('active-notes');
+          notebooksSidebar.classList.remove('active-notes');
+
+          const notesCount = document.getElementById('notes-count');
+          notesCount.textContent = notebooks.map(n => n.notes_count).reduce((a, b) => a + b, 0);
+        });
+    });
+
+    // Add a new note
+    const noteName = document.getElementById('note-name');
+    noteName.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        const noteForm = document.getElementById('note-form');
+        if (noteName.value === '') {
+          noteForm.classList.add('hidden');
+          return;
+        }
+
+        fetch('/api/note/create', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ title: noteName.value, notebook_id: selected_notebook.id }),
+        })
+          .then(response => response.json())
+          .then(data => {
+            noteName.value = '';
+            noteForm.classList.add('hidden');
+            selected_notebook.notes.push(data);
+            selected_notebook.notes_count += 1;
+
+            notebooks[notebooks.findIndex(n => n.id === selected_notebook.id)] = selected_notebook;
+
+            const notesCount = document.getElementById('notes-count');
+            notesCount.textContent = notebooks.map(n => n.notes_count).reduce((a, b) => a + b, 0);
+
+            const notebookElement = document.getElementById(`notebook-${selected_notebook.id}`);
+            notebookElement.querySelector('.notes_count').textContent = selected_notebook.notes_count;
+
+            updateNoteList(selected_notebook.notes);
+          });
+      }
+    });
+
+    // Update the notebook list
+    function updateNotebookList() {
+      // sort notebooks by creation date
+      notebooks.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+      const notebookList = document.getElementById('notebook-list');
+      notebookList.innerHTML = '';
+      notebooks.forEach(notebook => {
+        const li = document.createElement('li');
+        li.innerHTML = `
+          <div class="flex items-center my-1 p-2 pl-3 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group has-[:checked]:bg-gray-100 dark:has-[:checked]:bg-gray-700" id="notebook-${notebook.id}" onclick="showNotes(${notebook.id})">
+            <span class="flex-1 ms-3 whitespace-nowrap overflow-hidden text-ellipsis">${notebook.name}</span>
+            <span class="notes_count inline-flex items-center justify-center w-5 h-5 ms-2 text-sm rounded-full font-medium text-gray-800 bg-gray-100 dark:bg-gray-700 dark:text-gray-300 group-hover:text-gray-900 dark:group-hover:text-white transition duration-75">
+              ${notebook.notes_count}
+            </span>
+            <input type="radio" class="invisible" name="selected-notebook" value="${notebook.id}" ${selected_notebook && selected_notebook.id === notebook.id ? 'checked' : ''} />
+          </div>
+        `;
+        notebookList.appendChild(li);
+      });
+    }
+
+    // Update the note list
+    function updateNoteList(notes) {
+      // sort notes by creation date
+      notes.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+
+      const noteList = document.getElementById('note-list');
+      noteList.innerHTML = '';
+      let count = 0;
+      notes.forEach(note => {
+        const li = document.createElement('li');
+        li.id = `note-${note.id}`;
+        li.innerHTML = `
+          <div class="flex items-center my-2 mx-1 p-2 pl-3 rounded-lg text-gray-900 dark:text-white hover:bg-gray-200 dark:hover:bg-gray-800 group has-[:checked]:bg-gray-200 dark:has-[:checked]:bg-gray-800" onclick="showNoteContent(${note.id})">
+            <span class="flex-1 whitespace-nowrap overflow-hidden text-ellipsis">${note.title}</span>
+            <input type="radio" class="invisible" name="selected-note" value="${note.id}" ${selected_note && selected_note.id === note.id ? 'checked' : ''} />
+          </div>
+        `;
+        const hr = document.createElement('hr');
+        hr.classList.add('h-0.5', 'bg-gray-200', 'dark:bg-gray-600', 'border-0');
+        li.appendChild(hr);
+        noteList.appendChild(li);
+      });
+      noteList.classList.remove('hidden');
+    }
+
+    // Show note content
+  
+    function showNoteContent(noteId) {
+      const note = selected_notebook.notes.find(n => n.id === noteId);
+      const noteElement = document.getElementById(`note-${noteId}`);
+      const noteList = document.getElementById('note-list');
+      const noteContent = document.getElementById('note-content');
+
+      const noteElementInput = noteElement.querySelector('input');
+
+      if (noteElementInput.checked) {
+        noteElementInput.checked = false;
+        noteContent.classList.remove('active-notes');
+        selected_note = null;
+      } else {
+        noteElementInput.checked = true;
+        noteContent.classList.remove('active-notes');
+
+        setTimeout(() => {
+          noteContent.classList.add('active-notes');
+
+          const selectedNoteName = document.getElementById('selected-note-name');
+          const selectedNoteContent = document.getElementById('selected-note-content');
+
+          selectedNoteName.value = note.title;
+          selectedNoteContent.value = note.content;
+
+        }, selected_note ? 500 : 0);
+
+        selected_note = note;
+      }
+    }
+
+
+    // Update the note
+    const editNote = document.getElementById('edit-note');
+    editNote.addEventListener('click', () => {
+      if (!selected_note) {
+        return;
+      }
+
+      const selectedNoteName = document.getElementById('selected-note-name');
+      const selectedNoteContent = document.getElementById('selected-note-content');
+
+      if (selectedNoteName.value === '') {
+        return;
+      }
+
+      fetch(`/api/note/update/${selected_note.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ title: selectedNoteName.value, content: selectedNoteContent.value }),
+      })
+        .then(response => response.json())
+        .then(data => {
+          selected_notebook.notes[selected_notebook.notes.findIndex(n => n.id === selected_note.id)] = data;
+          selected_note = data;
+        });
+    });
+
+    // Delete the note
+    const deleteNote = document.getElementById('delete-note');
+    deleteNote.addEventListener('click', () => {
+      if (!selected_note) {
+        return;
+      }
+
+      fetch(`/api/note/delete/${selected_note.id}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+        .then(response => response.json())
+        .then(data => {
+          const noteElement = document.getElementById(`note-${selected_note.id}`);
+          noteElement.remove();
+
+          selected_notebook.notes.splice(selected_notebook.notes.findIndex(n => n.id === selected_note.id), 1);
+          selected_notebook.notes_count -= 1;
+
+          notebooks[notebooks.findIndex(n => n.id === selected_notebook.id)] = selected_notebook;
+
+          const notesCount = document.getElementById('notes-count');
+          notesCount.textContent = notebooks.map(n => n.notes_count).reduce((a, b) => a + b, 0);
+
+          const notebookElement = document.getElementById(`notebook-${selected_notebook.id}`);
+          notebookElement.querySelector('.notes_count').textContent = selected_notebook.notes_count;
+
+          const noteContent = document.getElementById('note-content');
+          noteContent.classList.remove('active-notes');
+          selected_note = null;
+        });
+    });
+
+    // Update notebook
+    const editNotebook = document.getElementById('edit-notebook');
+    editNotebook.addEventListener('click', () => {
+      if (!selected_notebook) {
+        return;
+      }
+
+      const selectedNotebookName = document.getElementById('selected-notebook-name');
+
+      if (selectedNotebookName.value === '') {
+        return;
+      }
+
+      fetch(`/api/notebook/update/${selected_notebook.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ name: selectedNotebookName.value }),
+      })
+        .then(response => response.json())
+        .then(data => {
+          const notebookElement = document.getElementById(`notebook-${selected_notebook.id}`);
+          notebookElement.querySelector('span').textContent = data.name;
+          selected_notebook = data;
+        });
+    });
+
+  </script>
+{% endblock scripts %}
