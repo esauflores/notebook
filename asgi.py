@@ -1,6 +1,6 @@
 # asgi.py
-import socketio
+from socketio import ASGIApp
 
-from app import app, socketio as app_socketio
+from app import app, socketio as sio
 
-asgi_app = socketio.ASGIApp(app_socketio, app)
+asgi_app = ASGIApp(sio, app)

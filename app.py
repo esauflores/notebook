@@ -33,7 +33,6 @@ db = SQLAlchemy()
 db.init_app(app)
 socketio = SocketIO(app, async_mode="eventlet")
 
-
 # backend
 from backend import *
 
