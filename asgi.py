@@ -1,8 +1,7 @@
 # asgi.py
-from asgiref.wsgi import WsgiToAsgi
-from socketio import ASGIApp
 
-from app import app, socketio as sio
+from asgiref.wsgi import WsgiToAsgi
+
+from app import app
 
 asgi_app = WsgiToAsgi(app)
-asgi_app = ASGIApp(sio, app)

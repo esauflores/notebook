@@ -31,6 +31,7 @@ app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 Session(app)
 db = SQLAlchemy()
 db.init_app(app)
+
 socketio = SocketIO(app, async_mode="eventlet")
 
 # backend
